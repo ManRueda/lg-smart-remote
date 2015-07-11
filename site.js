@@ -67,6 +67,10 @@ app.post('/channels', sessionProtection, function (req, res) {
   });
 });
 
+app.get('/printScreen', sessionProtection, function (req, res) {
+  req.session.control.printScreen().pipe(res);
+});
+
 var server = app.listen(3000, function () {
   var host = server.address().address;
   var port = server.address().port;
