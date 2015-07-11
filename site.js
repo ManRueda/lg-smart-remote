@@ -51,8 +51,19 @@ app.post('/auth', sessionProtection, function (req, res) {
 
 app.get('/run/:cmd', sessionProtection, function (req, res) {
   req.session.control.sendCommand(req.params.cmd, function(a){
-    req.session.lastResponse = a;
-    res.redirect('../');
+    res.json(a);
+  });
+});
+
+app.get('/channels', sessionProtection, function (req, res) {
+  req.session.control.channelList(function(a){
+    res.json(a);
+  });
+});
+
+app.post('/channels', sessionProtection, function (req, res) {
+  req.session.control.changeChannel(req.body, function(a){
+    res.json(a);
   });
 });
 
