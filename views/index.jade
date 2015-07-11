@@ -1,0 +1,35 @@
+doctype html
+html
+  head
+    title 
+    meta(charset="utf-8")
+    meta(name="description",content="")
+    meta(name="keywords",content="")
+    link(rel="stylesheet", href="bootstrap/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="bootstrap/dist/css/bootstrap-theme.min.css")
+  body
+    nav.navbar.navbar-default
+      div.collapse.navbar-collapse
+        form.navbar-form.navbar-left
+          div.form-group
+            input(type="text", placeholder="Search command", id="commandSearch").form-control
+    div.container-fluid
+      div.row
+        div.col-md-8.col-md-offset-2
+          ul.list-group.row
+            each key in Object.keys(cmds)
+              li.list-group-item.col-xs-3
+                a(data-cmd=cmds[key])= key
+      
+    script(type="text/javascript" src="jquery/dist/jquery.min.js")
+    script(type="text/javascript" src="bootstrap/dist/js/bootstrap.min.js")
+    script(type="text/javascript").
+      $('#commandSearch').keyup(function(){
+        $('li').removeClass('btn-warning')
+        if ($('#commandSearch').val() !== '')
+          $('li:contains("' + $('#commandSearch').val().toUpperCase() + '")').addClass('btn-warning');
+      });
+      
+      $('li a').click(function(){
+        $.get('run/' + $(this).data('cmd'));
+      });

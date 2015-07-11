@@ -1,0 +1,26 @@
+{
+  "name": "lg-smart-remote",
+  "version": "0.0.1",
+  "description": "LG Smart TV remote control",
+  "main": "lib/control.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManRueda/lg-smart-remote.git"
+  },
+  "author": "Manuel Rueda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ManRueda/lg-smart-remote/issues"
+  },
+  "homepage": "https://github.com/ManRueda/lg-smart-remote#readme",
+  "dependencies": {
+    "body-parser": "^1.13.2",
+    "express": "^4.13.1",
+    "express-session": "^1.11.3",
+    "jade": "^1.11.0",
+    "xml2js": "^0.4.9"
+  }
+}

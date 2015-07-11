@@ -1,0 +1,13 @@
+{
+  "name": "lg-smart-remote",
+  "main": "index.js",
+  "version": "0.0.1",
+  "authors": [
+    "Manuel Rueda <manuel.rueda.un@gmail.com>"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5"
+  }
+}
