@@ -119,13 +119,33 @@ html
       }
   body
     nav.navbar.navbar-default
-      div.collapse.navbar-collapse
-        form.navbar-form.navbar-left
-          div.form-group
-            input(type="text", placeholder="Search channel", id="commandChannel").form-control
-        form.navbar-form.navbar-left
-          div.form-group
-            input(type="text", placeholder="Search command", id="commandSearch").form-control
+      div.container-fluid
+        div.collapse.navbar-collapse
+          form.navbar-form.navbar-left
+            div.form-group
+              input(type="text", placeholder="Search channel", id="commandChannel").form-control
+          form.navbar-form.navbar-left
+            div.form-group
+              input(type="text", placeholder="Search command", id="commandSearch").form-control
+          ul.nav.navbar-nav
+            li
+              a(data-toggle="modal", data-target="#screenModal")
+                |Print Screen
+            li
+              a(data-toggle="modal", data-target="#liveModal")
+                |Live Screen
+            li
+              p.navbar-text
+                | Volume: 
+            li
+              div.form-group
+                div#volume.progress(style="width: 150px;margin-top: 10px;")
+                  div.progress-bar(role="progressbar", aria-valuenow="0", aria-valuemax="100", aria-valuemin="0", style="width: 0%;")
+                    | 0%
+            li
+              p#channel.navbar-text
+                | Channel: 
+          
     div#wrapper
       div#sidebar-wrapper
         ul.sidebar-nav
@@ -136,10 +156,30 @@ html
               ul.list-group.row#cmds
                 each key in Object.keys(cmds)
                   li.list-group-item.col-xs-3.btn.btn-link(data-cmd=cmds[key])= key
-      
+    
+    div.modal.fade#screenModal(role="dialog")
+      div.modal-dialog.modal-lg(role="document")
+        div.modal-content
+          div.modal-body
+            img(src="/printScreen")
+          div.modal-footer
+            button(type="button", data-dismiss="modal").btn.btn-default
+              | Close
+    div.modal.fade#liveModal(role="dialog")
+      div.modal-dialog.modal-lg(role="document")
+        div.modal-content
+          div.modal-body
+            div#screen(style="width:960px; height:540px ")
+          div.modal-footer
+            button(type="button", data-dismiss="modal").btn.btn-default
+              | Close
+    
+    
     script(type="text/javascript" src="jquery/dist/jquery.min.js")
     script(type="text/javascript" src="bootstrap/dist/js/bootstrap.min.js")
+    script(type="text/javascript" src="socket.io.js")
     script(type="text/javascript").
+      var socket = io();
       $('#commandSearch').keyup(function(){
         $('#cmds li').removeClass('btn-warning')
         if ($('#commandSearch').val() !== '')
@@ -157,12 +197,14 @@ html
       
       $('#cmds li').click(function(){
         $.get('run/' + $(this).data('cmd')).done(function(resp){
+          updateInfo();
           console.debug(resp);
         });
       });
       
       $('#sidebar-wrapper ul').on('click', 'li', function(){
         $.post('channels', $(this).data('channel')).done(function(resp){
+          updateInfo();
           console.debug(resp);
         });
       });
@@ -182,11 +224,41 @@ html
             minor: cha.minor[0],
             displayMinor: cha.displayMinor[0],
           });
-          li.text(cha.chname[0] + 
-          ' -' + 
-          cha.displayMajor[0] + 
+          li.text(cha.displayMajor[0] + 
           '.' + 
-          cha.displayMinor);
+          cha.displayMinor +
+          ' - ' + 
+          cha.chname[0]
+          );
           $('#sidebar-wrapper ul').append(li);
         }
       });
+      $('#screenModal').on('show.bs.modal', function (e) {
+        $('#screenModal img').attr('src', $('#screenModal img').attr('src'));
+      })
+      
+      $('#liveModal').on('show.bs.modal', function (e) {
+        socket.emit('play');
+      });
+      
+      $('#liveModal').on('hide.bs.modal', function (e) {
+        socket.emit('stop');
+      });
+      
+      socket.on('canvas', function(data){
+        $('#liveModal #screen').css('background', 'transparent url(data:image/jpeg;base64,'+data+') top left / 100% 100% no-repeat');
+      });
+      
+      function updateInfo(){
+        $.get('info').done(function(info){
+          $('#volume .progress-bar').attr('aria-valuenow', info.volume[0].level[0]);
+          $('#volume .progress-bar').attr('aria-valuemax', info.volume[0].maxLevel[0]);
+          $('#volume .progress-bar').attr('aria-valuemin', info.volume[0].minLevel[0]);
+          $('#volume .progress-bar').css('width', info.volume[0].level[0] + '%');
+          $('#volume .progress-bar').text(info.volume[0].level[0] + '%');
+          
+          $('#channel').text('Channel: ' + info.channel[0].major[0] + '.' + info.channel[0].minor[0] + ' - ' + info.channel[0].chname[0]);
+        });
+      }
+      
+      setInterval(updateInfo, 100);
