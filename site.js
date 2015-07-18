@@ -81,6 +81,17 @@ app.get('/info', sessionProtection, function (req, res) {
   });
 });
 
+app.get('/apps', sessionProtection, function (req, res) {
+  var response = {};
+  req.session.control.apps(function(a){
+    res.json(a);
+  });
+});
+
+app.get('/appIcon/:auid/:name', sessionProtection, function (req, res) {
+  req.session.control.appIcon(req.params.auid, req.params.name).pipe(res);
+});
+
 app.get('/channels', sessionProtection, function (req, res) {
   req.session.control.channelList(function(a){
     res.json(a);

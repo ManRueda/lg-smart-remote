@@ -117,6 +117,19 @@ html
               margin-right: 0;
           }
       }
+      
+      #apps li{
+        display: inline-block;
+        margin: 0 10px 10px 0;
+      }
+      #apps li img{
+        min-width: 130px;
+        min-height: 130px;
+      }
+      #apps .modal-body{
+        max-height: 600px;
+        overflow: auto;
+      }
   body
     nav.navbar.navbar-default
       div.container-fluid
@@ -134,6 +147,9 @@ html
             li
               a(data-toggle="modal", data-target="#liveModal")
                 |Live Screen
+            li
+              a(data-toggle="modal", data-target="#apps")
+                |Apps
             li
               p.navbar-text
                 | Volume: 
@@ -173,12 +189,27 @@ html
           div.modal-footer
             button(type="button", data-dismiss="modal").btn.btn-default
               | Close
+    div.modal.fade#apps(role="dialog")
+      div.modal-dialog.modal-lg(role="document")
+        div.modal-content
+          div.modal-body
+            ul
+          div.modal-footer
+            button(type="button", data-dismiss="modal").btn.btn-default
+              | Close
     
     
     script(type="text/javascript" src="jquery/dist/jquery.min.js")
     script(type="text/javascript" src="bootstrap/dist/js/bootstrap.min.js")
     script(type="text/javascript" src="socket.io.js")
     script(type="text/javascript").
+      //Make :contains case-insensitive
+      $.expr[":"].contains = $.expr.createPseudo(function(arg) {
+          return function( elem ) {
+              return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+          };
+      });
+
       var socket = io();
       $('#commandSearch').keyup(function(){
         $('#cmds li').removeClass('btn-warning')
@@ -262,3 +293,15 @@ html
       }
       
       setInterval(updateInfo, 100);
+      
+      
+      
+      $('#apps').on('show.bs.modal', function (e) {
+        var list = $(this).find('.modal-body ul');
+        list.html('');
+        $.get('apps').done(function(apps){
+          for(var i = 0; i < apps.length; i++){
+            list.append('<li><a><img src="appIcon/' + apps[i].auid + '/' + apps[i].name + '" /></a></li>');
+          }
+        });
+      });
